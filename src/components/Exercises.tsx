@@ -254,10 +254,7 @@ export function Exercises({ userName, userId }: ExercisesProps) {
                     <div className="p-6 flex-1 flex flex-col">
                       <h3 className="text-slate-900 dark:text-white mb-2 font-bold text-lg">{exercise.name}</h3>
                       <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 flex-1">{exercise.description}</p>
-                      <div className="flex items-center gap-2 mb-4 text-slate-500 text-sm">
-                        <Clock className="w-4 h-4" />
-                        <span>{exercise.duration}</span>
-                      </div>
+                      
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleStartExercise(exercise)}
@@ -280,36 +277,6 @@ export function Exercises({ userName, userId }: ExercisesProps) {
                 </div>
               );
             })}
-          </div>
-
-          {/* Progress Summary */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border-l-4 border-indigo-500">
-            <div className="flex items-center gap-3 mb-6">
-              <TrendingUp className="w-6 h-6 text-indigo-600" />
-              <h2 className="text-slate-900 dark:text-white font-bold text-xl uppercase tracking-tight">Your Progress</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">{completedExercises.length}</div>
-                <div className="text-slate-500 text-sm">Completed Today</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">{exercises.length}</div>
-                <div className="text-slate-500 text-sm">Total Exercises</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
-                  {Math.round((completedExercises.length / exercises.length) * 100)}%
-                </div>
-                <div className="text-slate-500 text-sm">Completion Rate</div>
-              </div>
-            </div>
-            <div className="mt-6 h-3 bg-slate-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-500 transition-all duration-500"
-                style={{ width: `${(completedExercises.length / exercises.length) * 100}%` }}
-              ></div>
-            </div>
           </div>
         </div>
       </div>

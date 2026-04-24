@@ -450,7 +450,7 @@ export function Dashboard({
 
           {/* ACTIVITIES */}
           <div
-            className="glass rounded-2xl p-6 border-l-4 border-teal-500 cursor-pointer hover:shadow-xl transition-all transform hover:-translate-y-1"
+            className="glass rounded-2xl p-6 border-l-4 border-teal-500"
             onClick={onNavigateToActivities}
           >
             <div className="flex items-start justify-between">
