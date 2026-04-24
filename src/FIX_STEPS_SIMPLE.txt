@@ -1,0 +1,82 @@
+═══════════════════════════════════════════════════
+  ✅ SIMPLE 3-STEP FIX (5 minutes total)
+═══════════════════════════════════════════════════
+
+📍 WHAT I DID:
+   ✅ Created new migration: 20260411120000_final_schema_fix.sql
+   ✅ Updated Edge Function to force redeploy
+   ✅ Migration will auto-run in Supabase
+
+═══════════════════════════════════════════════════
+
+🎯 YOUR STEPS:
+
+STEP 1: Push Migration to Supabase (2 minutes)
+   Terminal mein type karo:
+   
+   supabase db push
+   
+   (Yeh migration ko Supabase pe push karega)
+
+STEP 2: Redeploy Edge Function (1 minute)
+   Terminal mein type karo:
+   
+   supabase functions deploy make-server-40d4d8fd --no-verify-jwt
+   
+   (Yeh Edge Function ko redeploy karega)
+
+STEP 3: Test (2 minutes)
+   1. Browser cache clear karo (Ctrl+Shift+Delete)
+   2. Browser close karo completely  
+   3. Browser reopen karo
+   4. Resilio app kholo
+   5. Hard refresh (Ctrl+Shift+R)
+   6. Login karo
+   7. Entries section test karo
+
+═══════════════════════════════════════════════════
+
+✅ DONE! Error fix ho jayega!
+
+═══════════════════════════════════════════════════
+
+💡 YA SIMPLE VERSION (Agar terminal access nahi hai):
+
+   1. Supabase Dashboard → SQL Editor kholo
+   2. New Query click karo
+   3. Yeh SQL copy paste karo aur RUN karo:
+   
+      DROP TABLE IF EXISTS public.diary_entries CASCADE;
+      
+      CREATE TABLE IF NOT EXISTS public.kv_store_40d4d8fd (
+        key TEXT PRIMARY KEY,
+        value JSONB NOT NULL,
+        user_id UUID,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_kv_store_user_id ON public.kv_store_40d4d8fd(user_id);
+      CREATE INDEX IF NOT EXISTS idx_kv_store_created_at ON public.kv_store_40d4d8fd(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_kv_store_diary_entries ON public.kv_store_40d4d8fd(key) WHERE key LIKE 'diary_entry_%';
+      
+      ALTER TABLE public.kv_store_40d4d8fd ENABLE ROW LEVEL SECURITY;
+      DROP POLICY IF EXISTS "Allow all operations" ON public.kv_store_40d4d8fd;
+      CREATE POLICY "Allow all operations" ON public.kv_store_40d4d8fd FOR ALL USING (true) WITH CHECK (true);
+      
+      ANALYZE public.kv_store_40d4d8fd;
+      
+      DO $$
+      BEGIN
+        FOR i IN 1..20 LOOP
+          PERFORM pg_notify('pgrst', 'reload schema');
+        END LOOP;
+      END $$;
+   
+   4. Supabase Dashboard → Settings → API
+   5. "Restart PostgREST" button click karo
+   6. 2 minute wait karo
+   7. Browser cache clear + hard refresh
+   8. Test karo
+
+═══════════════════════════════════════════════════

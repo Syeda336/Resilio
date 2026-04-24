@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Queue Status - Resilio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #38a169;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+    }
+    
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background: #dd6b20;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(237, 137, 54, 0.4);
+    }
+    
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .stat-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-box h3 {
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+    
+    .stat-box p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .output {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      max-height: 500px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #667eea;
+      font-size: 1.2rem;
+    }
+    
+    .error {
+      background: #fed7d7;
+      color: #c53030;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    
+    .success {
+      background: #c6f6d5;
+      color: #22543d;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    
+    .timestamp {
+      text-align: right;
+      color: #718096;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    
+    .email-item {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 8px 0;
+    }
+    
+    .email-item h4 {
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    
+    .email-item p {
+      font-size: 0.9rem;
+      color: #4a5568;
+      margin: 3px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📧 Email Queue Monitor</h1>
+      <p>Resilio - Real-time Email Status Dashboard</p>
+    </div>
+    
+    <div class="card">
+      <h2 style="margin-bottom: 15px;">🎛️ Control Panel</h2>
+      <div class="button-group">
+        <button class="btn-primary" onclick="checkHealth()">🏥 Health Check</button>
+        <button class="btn-success" onclick="checkQueueStatus()">📊 Queue Status</button>
+        <button class="btn-warning" onclick="processQueue()">⚡ Process Queue</button>
+      </div>
+      
+      <div id="message"></div>
+    </div>
+    
+    <div class="card">
+      <h2 style="margin-bottom: 15px;">📊 Queue Summary</h2>
+      <div id="stats" class="status-grid">
+        <div class="stat-box">
+          <h3 id="total">-</h3>
+          <p>Total Emails</p>
+        </div>
+        <div class="stat-box">
+          <h3 id="pending">-</h3>
+          <p>Pending</p>
+        </div>
+        <div class="stat-box">
+          <h3 id="dueNow">-</h3>
+          <p>Due Now</p>
+        </div>
+        <div class="stat-box">
+          <h3 id="sent">-</h3>
+          <p>Sent</p>
+        </div>
+        <div class="stat-box">
+          <h3 id="failed">-</h3>
+          <p>Failed</p>
+        </div>
+      </div>
+      
+      <div class="timestamp" id="lastUpdate">Last updated: Never</div>
+    </div>
+    
+    <div class="card">
+      <h2 style="margin-bottom: 15px;">📝 Response Output</h2>
+      <div id="output" class="output">Click a button to see results...</div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = 'https://wuzbuxeqqubolujjtizc.supabase.co/functions/v1/make-server-40d4d8fd';
+    
+    function showMessage(text, type = 'info') {
+      const messageDiv = document.getElementById('message');
+      messageDiv.className = type;
+      messageDiv.textContent = text;
+      setTimeout(() => {
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+      }, 5000);
+    }
+    
+    function updateTimestamp() {
+      document.getElementById('lastUpdate').textContent = 
+        `Last updated: ${new Date().toLocaleString()}`;
+    }
+    
+    async function checkHealth() {
+      const output = document.getElementById('output');
+      output.textContent = '🔄 Checking server health...';
+      
+      try {
+        const response = await fetch(`${BASE_URL}/health`);
+        const data = await response.json();
+        
+        output.textContent = JSON.stringify(data, null, 2);
+        
+        if (data.status === 'ok') {
+          showMessage('✅ Server is healthy!', 'success');
+        } else {
+          showMessage('⚠️ Server responded but status is not OK', 'error');
+        }
+        
+        updateTimestamp();
+      } catch (error) {
+        output.textContent = `Error: ${error.message}`;
+        showMessage('❌ Failed to connect to server', 'error');
+      }
+    }
+    
+    async function checkQueueStatus() {
+      const output = document.getElementById('output');
+      output.textContent = '🔄 Fetching queue status...';
+      
+      try {
+        const response = await fetch(`${BASE_URL}/email/queue/status`);
+        const data = await response.json();
+        
+        output.textContent = JSON.stringify(data, null, 2);
+        
+        if (data.success) {
+          // Update stats
+          document.getElementById('total').textContent = data.summary.total || 0;
+          document.getElementById('pending').textContent = data.summary.pending || 0;
+          document.getElementById('dueNow').textContent = data.summary.dueNow || 0;
+          document.getElementById('sent').textContent = data.summary.sent || 0;
+          document.getElementById('failed').textContent = data.summary.failed || 0;
+          
+          showMessage('✅ Queue status fetched successfully!', 'success');
+        } else {
+          showMessage('⚠️ Failed to fetch queue status', 'error');
+        }
+        
+        updateTimestamp();
+      } catch (error) {
+        output.textContent = `Error: ${error.message}`;
+        showMessage('❌ Failed to fetch queue status', 'error');
+      }
+    }
+    
+    async function processQueue() {
+      const cronApiKey = prompt('Enter CRON_API_KEY (from Supabase environment variables):');
+      
+      if (!cronApiKey) {
+        showMessage('❌ CRON_API_KEY is required', 'error');
+        return;
+      }
+      
+      const output = document.getElementById('output');
+      output.textContent = '🔄 Processing pending emails...';
+      
+      try {
+        const response = await fetch(`${BASE_URL}/email/queue/process?api_key=${cronApiKey}`, {
+          method: 'POST',
+        });
+        
+        const data = await response.json();
+        
+        output.textContent = JSON.stringify(data, null, 2);
+        
+        if (data.success) {
+          showMessage(
+            `✅ Processed ${data.processed || 0} emails: ${data.sent || 0} sent, ${data.failed || 0} failed`,
+            'success'
+          );
+          
+          // Refresh stats after processing
+          setTimeout(checkQueueStatus, 1000);
+        } else {
+          showMessage('⚠️ Processing failed: ' + (data.error || 'Unknown error'), 'error');
+        }
+        
+        updateTimestamp();
+      } catch (error) {
+        output.textContent = `Error: ${error.message}`;
+        showMessage('❌ Failed to process queue', 'error');
+      }
+    }
+    
+    // Auto-refresh queue status every 30 seconds
+    setInterval(checkQueueStatus, 30000);
+    
+    // Initial load
+    checkQueueStatus();
+  </script>
+</body>
+</html>

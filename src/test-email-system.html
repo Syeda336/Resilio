@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email System - Resilio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        h1 { color: #1f2937; font-size: 36px; margin-bottom: 10px; }
+        h2 { color: #4b5563; font-size: 24px; margin: 30px 0 15px 0; }
+        h3 { color: #6b7280; font-size: 18px; margin: 20px 0 10px 0; }
+        p { color: #6b7280; line-height: 1.6; margin-bottom: 20px; }
+        .button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .button.secondary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        .button.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        .result {
+            background: #f9fafb;
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        .result.show { display: block; }
+        .result.error { border-left-color: #ef4444; background: #fef2f2; }
+        .result.success { border-left-color: #10b981; background: #f0fdf4; }
+        .result.info { border-left-color: #3b82f6; background: #eff6ff; }
+        .result pre {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .step {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .step-number {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="date"], input[type="time"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 8px 0;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+        label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .loader {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        .loader.show { display: block; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📧 Email System Tester</h1>
+            <p>Test your Resilio email notification system</p>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Step 1: Check SMTP Configuration</h2>
+            <p>First, make sure you've set up SMTP credentials in Supabase:</p>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Go to Supabase Dashboard → Settings → Edge Functions</strong>
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Add these secrets:</strong>
+                <ul style="margin-left: 40px; margin-top: 10px; color: #6b7280;">
+                    <li>SMTP_HOST = smtp.gmail.com</li>
+                    <li>SMTP_PORT = 587</li>
+                    <li>SMTP_USER = your-email@gmail.com</li>
+                    <li>SMTP_PASSWORD = your-app-password</li>
+                    <li>SMTP_FROM = your-email@gmail.com</li>
+                </ul>
+            </div>
+
+            <button class="button secondary" onclick="window.open('https://supabase.com/dashboard/project/wuzbuxeqqubolujjtizc/settings/functions', '_blank')">
+                Open Supabase Settings
+            </button>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Step 2: Create Test Reminder</h2>
+            <p>Create a reminder with a past date to test email sending:</p>
+
+            <label>Task Name</label>
+            <input type="text" id="taskName" value="Test Email Notification" placeholder="Enter task name">
+
+            <label>Date (use yesterday's date)</label>
+            <input type="date" id="reminderDate">
+
+            <label>Time</label>
+            <input type="time" id="reminderTime" value="10:00">
+
+            <button class="button" onclick="createTestReminder()">
+                Create Test Reminder
+            </button>
+
+            <div id="createResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>🚀 Step 3: Trigger Email Scheduler</h2>
+            <p>Manually trigger the scheduler to check for due reminders and send emails:</p>
+
+            <button class="button" onclick="triggerScheduler()">
+                Run Email Scheduler Now
+            </button>
+
+            <div class="loader" id="schedulerLoader"></div>
+            <div id="schedulerResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>📋 Step 4: Check Results</h2>
+            <p>View all reminders and their email status:</p>
+
+            <button class="button secondary" onclick="checkReminders()">
+                Check All Reminders
+            </button>
+
+            <div id="remindersResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>🧹 Cleanup</h2>
+            <p>Delete test reminders after testing:</p>
+
+            <button class="button danger" onclick="deleteAllTestReminders()">
+                Delete All Test Reminders
+            </button>
+
+            <div id="deleteResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wuzbuxeqqubolujjtizc.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emJ1eGVxcXVib2x1amp0aXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4ODYxNDgsImV4cCI6MjA3OTQ2MjE0OH0.E3MJZX_jBTsrGMnH3w4hW6ONJlioGcuaJx45BQ02Co8';
+
+        // Set yesterday's date by default
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        document.getElementById('reminderDate').value = yesterday.toISOString().split('T')[0];
+
+        async function createTestReminder() {
+            const taskName = document.getElementById('taskName').value;
+            const date = document.getElementById('reminderDate').value;
+            const time = document.getElementById('reminderTime').value;
+
+            if (!taskName || !date || !time) {
+                showResult('createResult', 'error', '❌ Please fill in all fields');
+                return;
+            }
+
+            // Get access token from localStorage
+            const accessToken = localStorage.getItem('resilio_access_token');
+            if (!accessToken) {
+                showResult('createResult', 'error', '❌ You must be logged in to Resilio. Please log in first.');
+                return;
+            }
+
+            const reminder = {
+                id: Date.now().toString(),
+                task: taskName,
+                date: date,
+                time: time,
+                completed: false,
+                created: new Date().toISOString(),
+            };
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/make-server-40d4d8fd/reminders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                    body: JSON.stringify(reminder),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult('createResult', 'success', 
+                        `✅ Test reminder created successfully!\n\nReminder ID: ${data.reminder.id}\nTask: ${data.reminder.task}\nScheduled: ${date} at ${time}\n\nNow click "Run Email Scheduler Now" to send the email.`
+                    );
+                } else {
+                    showResult('createResult', 'error', `❌ Failed to create reminder: ${data.error}`);
+                }
+            } catch (error) {
+                showResult('createResult', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        async function triggerScheduler() {
+            const loader = document.getElementById('schedulerLoader');
+            const resultDiv = document.getElementById('schedulerResult');
+            
+            loader.classList.add('show');
+            resultDiv.classList.remove('show');
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/make-server-40d4d8fd/cron/check-scheduled-emails`);
+                const data = await response.json();
+
+                loader.classList.remove('show');
+
+                if (data.success) {
+                    const { remindersSent, messagesSent, errors } = data.results;
+                    
+                    let message = `✅ Scheduler completed!\n\n`;
+                    message += `📧 Reminders sent: ${remindersSent}\n`;
+                    message += `📧 Messages sent: ${messagesSent}\n`;
+                    message += `⏰ Timestamp: ${data.timestamp}\n\n`;
+                    
+                    if (errors.length > 0) {
+                        message += `⚠️ Errors (${errors.length}):\n${errors.join('\n')}`;
+                        showResult('schedulerResult', 'info', message);
+                    } else {
+                        message += `✅ No errors!`;
+                        showResult('schedulerResult', 'success', message);
+                    }
+
+                    if (remindersSent > 0 || messagesSent > 0) {
+                        message += `\n\n🎉 Check your email inbox now!`;
+                    } else {
+                        message += `\n\nℹ️ No emails were sent. This means:\n- No reminders/messages are past their scheduled time\n- All due items have already been sent\n\nTry creating a reminder with yesterday's date.`;
+                    }
+
+                    showResult('schedulerResult', remindersSent > 0 || messagesSent > 0 ? 'success' : 'info', message);
+                    
+                    // Show raw response
+                    const pre = document.createElement('pre');
+                    pre.textContent = JSON.stringify(data, null, 2);
+                    document.getElementById('schedulerResult').appendChild(pre);
+                } else {
+                    showResult('schedulerResult', 'error', `❌ Scheduler failed: ${data.error}\n\nCheck Supabase Edge Function logs for details.`);
+                }
+            } catch (error) {
+                loader.classList.remove('show');
+                showResult('schedulerResult', 'error', `❌ Failed to trigger scheduler: ${error.message}\n\nMake sure your Supabase Edge Functions are deployed.`);
+            }
+        }
+
+        async function checkReminders() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/make-server-40d4d8fd/reminders`, {
+                    headers: { 'Authorization': `Bearer ${ANON_KEY}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const reminders = data.reminders || [];
+                    
+                    if (reminders.length === 0) {
+                        showResult('remindersResult', 'info', 'ℹ️ No reminders found. Create one first!');
+                        return;
+                    }
+
+                    let message = `📋 Found ${reminders.length} reminder(s):\n\n`;
+                    
+                    reminders.forEach((r, i) => {
+                        message += `${i + 1}. ${r.task}\n`;
+                        message += `   📅 Scheduled: ${r.date} at ${r.time}\n`;
+                        message += `   📧 Email sent: ${r.emailSent ? '✅ Yes' : '❌ No'}\n`;
+                        if (r.emailSentAt) {
+                            message += `   📧 Sent at: ${r.emailSentAt}\n`;
+                        }
+                        message += `   ✓ Completed: ${r.completed ? 'Yes' : 'No'}\n\n`;
+                    });
+
+                    showResult('remindersResult', 'success', message);
+
+                    // Show raw data
+                    const pre = document.createElement('pre');
+                    pre.textContent = JSON.stringify(reminders, null, 2);
+                    document.getElementById('remindersResult').appendChild(pre);
+                } else {
+                    showResult('remindersResult', 'error', `❌ Failed to fetch reminders: ${data.error}`);
+                }
+            } catch (error) {
+                showResult('remindersResult', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        async function deleteAllTestReminders() {
+            if (!confirm('Are you sure you want to delete ALL test reminders?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/make-server-40d4d8fd/reminders`, {
+                    headers: { 'Authorization': `Bearer ${ANON_KEY}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const reminders = data.reminders || [];
+                    const testReminders = reminders.filter(r => r.task.includes('Test'));
+
+                    if (testReminders.length === 0) {
+                        showResult('deleteResult', 'info', 'ℹ️ No test reminders to delete');
+                        return;
+                    }
+
+                    let deleted = 0;
+                    for (const reminder of testReminders) {
+                        try {
+                            await fetch(`${SUPABASE_URL}/functions/v1/make-server-40d4d8fd/reminders/${reminder.id}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${ANON_KEY}` }
+                            });
+                            deleted++;
+                        } catch (e) {
+                            console.error('Failed to delete:', e);
+                        }
+                    }
+
+                    showResult('deleteResult', 'success', `✅ Deleted ${deleted} test reminder(s)`);
+                } else {
+                    showResult('deleteResult', 'error', `❌ Failed to fetch reminders: ${data.error}`);
+                }
+            } catch (error) {
+                showResult('deleteResult', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        function showResult(id, type, message) {
+            const div = document.getElementById(id);
+            div.className = `result show ${type}`;
+            div.innerHTML = `<pre style="background: transparent; color: #1f2937; white-space: pre-wrap; padding: 0;">${message}</pre>`;
+        }
+    </script>
+</body>
+</html>

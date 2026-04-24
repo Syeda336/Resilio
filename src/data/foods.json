@@ -1,0 +1,35 @@
+[
+  {
+    "food_id": "FDI_1",
+    "food_name": "Apple Gala",
+    "food_category": "Fruit",
+    "food_description": "A sweet and crisp variety of apple that is widely enjoyed as a fresh snack or in salads.",
+    "Calories_grams": 52.0,
+    "Protein_g": 0.3,
+    "Carbs_g": 13.8,
+    "Fat_g": 0.2,
+    "Benefits": "High in pectin fiber for heart health"
+  },
+  {
+    "food_id": "FDI_2",
+    "food_name": "Banana Cavendish",
+    "food_category": "Fruit",
+    "food_description": "The most popular yellow fruit known for its convenient packaging and high potassium content.",
+    "Calories_grams": 89.0,
+    "Protein_g": 1.1,
+    "Carbs_g": 22.8,
+    "Fat_g": 0.3,
+    "Benefits": "Provides quick energy and muscle support"
+  },
+  {
+    "food_id": "FDI_3",
+    "food_name": "Long Grain White Rice",
+    "food_category": "Grain",
+    "food_description": "A versatile staple crop that serves as a primary source of carbohydrates for billions worldwide.",
+    "Calories_grams": 130.0,
+    "Protein_g": 2.7,
+    "Carbs_g": 28.2,
+    "Fat_g": 0.3,
+    "Benefits": "Easy to digest and gluten-free energy"
+  }
+]
