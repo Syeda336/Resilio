@@ -212,42 +212,11 @@ export function FutureSelfMessaging() {
       <h2 className="text-black text-center">Future Self Messaging</h2>
       <p className="text-center text-gray-600">Send messages to your future self that will appear at the scheduled time</p>
 
-      {/* Email Notification Info Banner */}
-      <div className="bg-blue-50 border-2 border-blue-300 p-4 space-y-2">
-        <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-            ℹ️
-          </div>
-          <div className="flex-1">
-            <h4 className="text-blue-900 font-semibold mb-1">📬 Dual Notification System</h4>
-            <p className="text-blue-800 text-sm leading-relaxed">
-              When you schedule a message, you'll receive:<br />
-              <strong>1. In-App Notification:</strong> A beautiful popup will appear on screen at the scheduled time<br />
-              <strong>2. Email Notification:</strong> An email will be sent to the address you provide below
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Create New Message */}
       <div className="bg-gray-50 border-2 border-gray-300 p-6 space-y-4">
         <h3 className="text-black">Create New Message</h3>
 
-        {/* Email Input Field */}
-        <div className="space-y-2">
-          <label className="text-black flex items-center gap-2">
-            <Mail className="w-4 h-4" />
-            Your Email Address
-          </label>
-          <input
-            type="email"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full px-4 py-3 bg-white border-2 border-gray-300 focus:border-emerald-600 focus:outline-none text-black placeholder-gray-400"
-          />
-          <p className="text-gray-600 text-sm">The message notification will be sent to this email address</p>
-        </div>
+        
 
         <div className="space-y-2">
           <label className="text-black">Your Message</label>
