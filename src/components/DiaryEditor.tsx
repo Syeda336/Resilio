@@ -528,38 +528,7 @@ export function DiaryEditor() {
         </div>
       </div>
 
-      {/* Mood Input */}
-      <div className="space-y-2">
-        <label className="text-black">How are you feeling?</label>
-        <select
-          value={mood}
-          onChange={(e) => setMood(e.target.value)}
-          className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none text-black"
-        >
-          <option value="">Select your mood...</option>
-          <option value="Happy 😊">Happy 😊</option>
-          <option value="Excited 🎉">Excited 🎉</option>
-          <option value="Grateful 🙏">Grateful 🙏</option>
-          <option value="Peaceful 🌿">Peaceful 🌿</option>
-          <option value="Calm 😌">Calm 😌</option>
-          <option value="Content 😊">Content 😊</option>
-          <option value="Thoughtful 🤔">Thoughtful 🤔</option>
-          <option value="Hopeful ✨">Hopeful ✨</option>
-          <option value="Loved 💖">Loved 💖</option>
-          <option value="Energetic ⚡">Energetic ⚡</option>
-          <option value="Relaxed 😌">Relaxed 😌</option>
-          <option value="Neutral 😐">Neutral 😐</option>
-          <option value="Tired 😴">Tired 😴</option>
-          <option value="Stressed 😰">Stressed 😰</option>
-          <option value="Anxious 😟">Anxious 😟</option>
-          <option value="Sad 😢">Sad 😢</option>
-          <option value="Frustrated 😤">Frustrated 😤</option>
-          <option value="Overwhelmed 😵">Overwhelmed 😵</option>
-          <option value="Angry 😠">Angry 😠</option>
-          <option value="Lonely 😔">Lonely 😔</option>
-        </select>
-      </div>
-
+      
       {/* Debug Display - Remove this after testing */}
       {listening && (
         <div className="p-4 bg-blue-50 border-2 border-blue-300 rounded-xl">
