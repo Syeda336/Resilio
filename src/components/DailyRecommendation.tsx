@@ -12,10 +12,22 @@ interface DailyRecommendationProps {
 export function DailyRecommendation({ userId, accessToken, projectId }: DailyRecommendationProps) {
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     loadRecommendation();
   }, [userId, accessToken, projectId]);
+
+  useEffect(() => {
+    if (!loading && recommendation) {
+      // Delay showing the popup by 2 seconds
+      const timer = setTimeout(() => {
+        setShowPopup(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, recommendation]);
 
   const loadRecommendation = async () => {
     setLoading(true);
@@ -29,12 +41,12 @@ export function DailyRecommendation({ userId, accessToken, projectId }: DailyRec
     }
   };
 
-  if (loading || !recommendation) {
+  if (loading || !recommendation || !showPopup) {
     return null;
   }
 
   return (
-    <div className="relative mb-6 overflow-hidden">
+    <div className="relative mb-6 overflow-hidden popup-animation">
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 opacity-90 animate-gradient-x"></div>
       
@@ -62,9 +74,7 @@ export function DailyRecommendation({ userId, accessToken, projectId }: DailyRec
               <h3 className="text-white font-bold text-lg">
                 Daily Wellness Tip
               </h3>
-              <div className="px-2 py-0.5 bg-white/20 rounded-full text-xs text-white font-medium">
-                Day {new Date().getDate()}
-              </div>
+              
             </div>
             
             <p className="text-white/95 text-base leading-relaxed">
@@ -86,12 +96,33 @@ export function DailyRecommendation({ userId, accessToken, projectId }: DailyRec
             background-position: 100% 50%;
           }
         }
-        
+
+        @keyframes popup {
+          0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+          }
+          60% {
+            transform: scale(1.05) translateY(-5px);
+          }
+          80% {
+            transform: scale(0.98) translateY(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+
         .animate-gradient-x {
           background-size: 200% 200%;
           animation: gradient-x 8s ease infinite;
         }
-        
+
+        .popup-animation {
+          animation: popup 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
         .delay-300 {
           animation-delay: 300ms;
         }
