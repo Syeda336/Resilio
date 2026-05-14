@@ -2211,6 +2211,103 @@ app.get('/make-server-40d4d8fd/email/queue/status', async (c) => {
   }
 });
 
+// Send Welcome Email (after signup)
+app.post('/make-server-40d4d8fd/send-welcome-email', async (c) => {
+  try {
+    const authHeader = c.req.header('Authorization');
+    const accessToken = authHeader?.split(' ')[1];
+
+    if (!accessToken) {
+      return c.json({ error: 'No access token provided' }, 401);
+    }
+
+    const { user } = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const { userName, userEmail } = await c.req.json();
+
+    console.log('📧 [Welcome Email] Sending welcome email to:', userEmail);
+
+    try {
+      const { sendWelcomeEmail } = await import('./email_nodemailer.tsx');
+
+      await sendWelcomeEmail(userEmail, userName);
+
+      console.log('✅ [Welcome Email] Email sent successfully to:', userEmail);
+
+      return c.json({
+        success: true,
+        message: 'Welcome email sent successfully'
+      });
+    } catch (emailError: any) {
+      console.error('❌ [Welcome Email] Error:', emailError);
+      return c.json({
+        success: false,
+        error: emailError.message
+      }, 500);
+    }
+  } catch (error: any) {
+    console.error('❌ [Welcome Email] Server error:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// Send Login Notification Email
+app.post('/make-server-40d4d8fd/send-login-email', async (c) => {
+  try {
+    const authHeader = c.req.header('Authorization');
+    const accessToken = authHeader?.split(' ')[1];
+
+    if (!accessToken) {
+      return c.json({ error: 'No access token provided' }, 401);
+    }
+
+    const { user } = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const { userName, userEmail } = await c.req.json();
+
+    console.log('📧 [Login Email] Sending login notification to:', userEmail);
+
+    try {
+      const { sendLoginEmail } = await import('./email_nodemailer.tsx');
+
+      const now = new Date();
+      const loginTime = now.toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      await sendLoginEmail(userEmail, userName, loginTime);
+
+      console.log('✅ [Login Email] Email sent successfully to:', userEmail);
+
+      return c.json({
+        success: true,
+        message: 'Login notification email sent successfully'
+      });
+    } catch (emailError: any) {
+      console.error('❌ [Login Email] Error:', emailError);
+      return c.json({
+        success: false,
+        error: emailError.message
+      }, 500);
+    }
+  } catch (error: any) {
+    console.error('❌ [Login Email] Server error:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
 // Send Future Message Email - QUEUE FOR SCHEDULED DELIVERY
 app.post('/make-server-40d4d8fd/send-future-message-email', async (c) => {
   try {
