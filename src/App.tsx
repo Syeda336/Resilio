@@ -298,7 +298,7 @@ export default function App() {
   if (authView === 'welcome') {
     return (
       <>
-        <CacheClearBanner />
+        
         <WelcomePage
           onLogin={() => setAuthView('login')}
           onSignUp={() => setAuthView('signup')}
@@ -310,7 +310,7 @@ export default function App() {
   if (authView === 'login') {
     return (
       <>
-        <CacheClearBanner />
+        
         <LoginPage
           onBack={() => setAuthView('welcome')}
           onLogin={handleLogin}
@@ -323,7 +323,7 @@ export default function App() {
   if (authView === 'signup') {
     return (
       <>
-        <CacheClearBanner />
+        
         <SignUpPage
           onBack={() => setAuthView('welcome')}
           onSignUp={handleSignUp}
@@ -336,7 +336,7 @@ export default function App() {
   if (authView === 'reset-password') {
     return (
       <>
-        <CacheClearBanner />
+        
         <ResetPasswordPage
           onBack={() => setAuthView('welcome')}
         />
@@ -347,7 +347,6 @@ export default function App() {
   // Show main app after authentication
   return (
     <>
-      <CacheClearBanner />
       <ThemeProvider>
         <ThemedApp
           userName={userName}
