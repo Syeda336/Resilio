@@ -594,3 +594,243 @@ export async function sendMealEmail(
     throw error;
   }
 }
+
+// Send Welcome Email (after signup)
+export async function sendWelcomeEmail(
+  userEmail: string,
+  userName: string
+) {
+  console.log('📧 Sending welcome email to:', userEmail);
+
+  const smtpHost = Deno.env.get('SMTP_HOST');
+  const smtpPort = Deno.env.get('SMTP_PORT');
+  const smtpUser = Deno.env.get('SMTP_USER');
+  const smtpPassword = Deno.env.get('SMTP_PASSWORD');
+  const smtpFrom = Deno.env.get('SMTP_FROM') || smtpUser;
+
+  if (!smtpHost || !smtpUser || !smtpPassword) {
+    console.log('⚠️ SMTP not configured - Email will be logged only');
+    console.log('📧 ===== WELCOME EMAIL =====');
+    console.log(`📬 To: ${userEmail}`);
+    console.log(`👤 Name: ${userName}`);
+    console.log('===========================');
+    return { success: true, mode: 'console-log', data: { id: `demo-${Date.now()}` } };
+  }
+
+  try {
+    const nodemailer = await import('npm:nodemailer@6.9.7');
+
+    const transporter = nodemailer.default.createTransport({
+      host: smtpHost,
+      port: parseInt(smtpPort || '587'),
+      secure: smtpPort === '465',
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
+      },
+    });
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Resilio" <${smtpFrom}>`,
+      to: userEmail,
+      subject: '🎉 Welcome to Resilio - Your Personal Wellness Journey Begins!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
+          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 40px; border-radius: 10px; text-align: center;">
+            <h1 style="margin: 0; font-size: 32px;">🎉 Welcome to Resilio!</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.95;">Your Personal Wellness Journey Begins</p>
+          </div>
+
+          <div style="background-color: white; padding: 30px; margin-top: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <p style="color: #1f2937; font-size: 18px; margin-bottom: 20px;">Dear <strong>${userName}</strong>,</p>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+              Welcome to Resilio! We're thrilled to have you join our community.
+            </p>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+              Resilio is your personal companion for mental wellness, self-reflection, and personal growth. We've created a safe, supportive space where you can:
+            </p>
+
+            <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <ul style="color: #047857; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>✨ Track your daily moods and emotions</li>
+                <li>📔 Write private diary entries with rich formatting</li>
+                <li>💭 Send messages to your future self</li>
+                <li>⏰ Set personal reminders for important tasks</li>
+                <li>🍎 Plan and track your diet and nutrition</li>
+                <li>🎮 Play mindfulness games and exercises</li>
+                <li>💬 Chat with Care Buddy, your AI wellness companion</li>
+              </ul>
+            </div>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; font-weight: bold;">
+              Your account has been successfully created, and you're all set to begin your wellness journey.
+            </p>
+
+            <div style="background-color: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="color: #1e40af; font-size: 15px; margin: 0 0 10px 0; font-weight: bold;">We recommend starting by:</p>
+              <ol style="color: #1e3a8a; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>Exploring the Dashboard to see your activity overview</li>
+                <li>Creating your first diary entry to capture today's thoughts</li>
+                <li>Setting up a future self message for motivation</li>
+                <li>Checking out the Mini Games section for stress relief</li>
+              </ol>
+            </div>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+              Remember, Resilio is here to support you every step of the way. Your privacy and security are our top priorities - all your data is encrypted and stored securely.
+            </p>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+              If you have any questions or need assistance, don't hesitate to reach out. We're here to help!
+            </p>
+
+            <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="color: #92400e; font-size: 14px; margin: 0;">
+                <strong>Account Details:</strong><br/>
+                📧 Email: ${userEmail}<br/>
+                📅 Created: ${currentDate}
+              </p>
+            </div>
+
+            <p style="color: #047857; font-size: 18px; font-weight: bold; text-align: center; margin: 30px 0 20px 0;">
+              Here's to a healthier, happier you! 🌟
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #9ca3af; font-size: 12px;">
+            <p style="margin: 5px 0;">Warm regards,</p>
+            <p style="margin: 5px 0; font-weight: bold;">The Resilio Team</p>
+            <p style="margin: 15px 0 5px 0; font-size: 11px;">This email was sent because you created a new account on Resilio.</p>
+          </div>
+        </div>
+      `,
+    });
+
+    console.log('✅ Welcome email sent successfully to:', userEmail);
+    console.log('📬 Message ID:', info.messageId);
+    return { success: true, mode: 'sent', data: { messageId: info.messageId } };
+  } catch (error: any) {
+    console.error('❌ Error sending welcome email via SMTP:', error);
+    throw error;
+  }
+}
+
+// Send Login Notification Email
+export async function sendLoginEmail(
+  userEmail: string,
+  userName: string,
+  loginTime: string
+) {
+  console.log('📧 Sending login notification email to:', userEmail);
+
+  const smtpHost = Deno.env.get('SMTP_HOST');
+  const smtpPort = Deno.env.get('SMTP_PORT');
+  const smtpUser = Deno.env.get('SMTP_USER');
+  const smtpPassword = Deno.env.get('SMTP_PASSWORD');
+  const smtpFrom = Deno.env.get('SMTP_FROM') || smtpUser;
+
+  if (!smtpHost || !smtpUser || !smtpPassword) {
+    console.log('⚠️ SMTP not configured - Email will be logged only');
+    console.log('📧 ===== LOGIN NOTIFICATION EMAIL =====');
+    console.log(`📬 To: ${userEmail}`);
+    console.log(`👤 Name: ${userName}`);
+    console.log(`🕐 Time: ${loginTime}`);
+    console.log('======================================');
+    return { success: true, mode: 'console-log', data: { id: `demo-${Date.now()}` } };
+  }
+
+  try {
+    const nodemailer = await import('npm:nodemailer@6.9.7');
+
+    const transporter = nodemailer.default.createTransport({
+      host: smtpHost,
+      port: parseInt(smtpPort || '587'),
+      secure: smtpPort === '465',
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Resilio" <${smtpFrom}>`,
+      to: userEmail,
+      subject: '🔐 Login Notification - Resilio Account Access',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 40px; border-radius: 10px; text-align: center;">
+            <h1 style="margin: 0; font-size: 32px;">🔐 Login Detected</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.95;">Your Resilio Account Was Accessed</p>
+          </div>
+
+          <div style="background-color: white; padding: 30px; margin-top: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <p style="color: #1f2937; font-size: 18px; margin-bottom: 20px;">Dear <strong>${userName}</strong>,</p>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+              We noticed you just logged into your Resilio account. <strong>Welcome back!</strong>
+            </p>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; font-weight: bold; margin-top: 30px;">
+              Your wellness journey continues! Here's what you can do today:
+            </p>
+
+            <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <ul style="color: #047857; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>✍️ Journal your thoughts and feelings</li>
+                <li>📊 Review your mood history and patterns</li>
+                <li>📬 Check any scheduled future messages</li>
+                <li>⏰ Review your upcoming reminders</li>
+                <li>🍎 Update your meal plans and track nutrition</li>
+                <li>🎮 Take a mindfulness break with our games</li>
+                <li>💬 Chat with Care Buddy for support and guidance</li>
+              </ul>
+            </div>
+
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+              We're glad to have you back and hope you make the most of your time on Resilio today.
+            </p>
+
+            <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 30px 0; border-left: 4px solid #ef4444;">
+              <p style="color: #991b1b; font-size: 15px; margin: 0 0 10px 0; font-weight: bold;">🔒 Security Notice:</p>
+              <p style="color: #7f1d1d; font-size: 14px; margin: 0; line-height: 1.6;">
+                If this login wasn't you, please secure your account immediately by:
+              </p>
+              <ul style="color: #7f1d1d; font-size: 14px; line-height: 1.8; margin: 10px 0 0 0; padding-left: 20px;">
+                <li>Changing your password</li>
+                <li>Reviewing your account activity</li>
+                <li>Contacting our support team</li>
+              </ul>
+            </div>
+
+            <p style="color: #047857; font-size: 18px; font-weight: bold; text-align: center; margin: 30px 0 20px 0;">
+              Stay well and take care! 🌟
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #9ca3af; font-size: 12px;">
+            <p style="margin: 5px 0;">Best regards,</p>
+            <p style="margin: 5px 0; font-weight: bold;">The Resilio Team</p>
+            <p style="margin: 15px 0 5px 0; font-size: 11px;">This is an automated login notification email.</p>
+            <p style="margin: 5px 0; font-size: 11px;">For your security, we notify you of all account logins.</p>
+          </div>
+        </div>
+      `,
+    });
+
+    console.log('✅ Login email sent successfully to:', userEmail);
+    console.log('📬 Message ID:', info.messageId);
+    return { success: true, mode: 'sent', data: { messageId: info.messageId } };
+  } catch (error: any) {
+    console.error('❌ Error sending login email via SMTP:', error);
+    throw error;
+  }
+}
